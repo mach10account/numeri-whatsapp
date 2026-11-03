@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Salva nel calendario · Salone Vincente</title>
+<style>
+  body { margin: 0; font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         color: #14213d; background: #f5f7fb; display: grid; place-items: center; min-height: 100vh; }
+  .card { background: #fff; border-radius: 14px; padding: 24px; max-width: 360px; text-align: center;
+          border: 1px solid #e3e8f0; }
+  a.btn { display: block; margin-top: 14px; padding: 12px; border-radius: 10px; background: #0654AE;
+          color: #fff; text-decoration: none; font-weight: 600; }
+  a.btn.alt { background: #fff; color: #0654AE; border: 1px solid #0654AE; }
+</style>
+</head>
+<body>
+<!--
+  Link «Salva nel calendario» dei messaggi WhatsApp dell'hiring (template hiring_webinar_*).
+  ?e=AAAAMMGGHHMM (ora italiana) &z=<id riunione Zoom> &p=<password Zoom> [&m=<minuti>, default 60]
+  Apre Google Calendar con l'evento già compilato; in più offre il file .ics per chi non usa Google.
+-->
+<div class="card">
+  <b id="titolo">Videochiamata Salone Vincente</b>
+  <div id="quando"></div>
+  <a class="btn" id="google" href="#">Salva su Google Calendar</a>
+  <a class="btn alt" id="ics" href="#" download="videochiamata-salone-vincente.ics">Salva su iPhone / altro calendario</a>
+</div>
+<script>
+const q = new URLSearchParams(location.search);
+const e = (q.get("e") || "").replace(/\D/g, "");
+const durata = parseInt(q.get("m") || "60", 10) || 60;
+const zoom = q.get("z") ? `https://us06web.zoom.us/j/${q.get("z").replace(/\D/g, "")}` + (q.get("p") ? `?pwd=${encodeURIComponent(q.get("p"))}` : "") : "";
+const titolo = "Videochiamata Salone Vincente - presentazione posizione";
+const dettagli = "Presentazione dell'offerta lavorativa di Salone Vincente." + (zoom ? `\n\nLink Zoom: ${zoom}` : "");
+
+if (e.length === 12) {
+  const [a, mo, g, h, mi] = [e.slice(0, 4), e.slice(4, 6), e.slice(6, 8), e.slice(8, 10), e.slice(10, 12)];
+  const inizio = new Date(Date.UTC(+a, +mo - 1, +g, +h, +mi));
+  const fine = new Date(inizio.getTime() + durata * 60000);
+  const loc = (d) => d.toISOString().replace(/[-:]/g, "").slice(0, 15);   // ora «da muro», senza Z
+  const date = `${loc(inizio)}/${loc(fine)}`;
+
+  const g_url = "https://calendar.google.com/calendar/render?" + new URLSearchParams({
+    action: "TEMPLATE", text: titolo, dates: date, ctz: "Europe/Rome", details: dettagli, location: zoom,
+  }).toString();
+  document.getElementById("google").href = g_url;
+  document.getElementById("quando").textContent = inizio.toLocaleDateString("it-IT",
+    { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }) + ` alle ${h}:${mi}`;
+
+  const esc = (s) => s.replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\n/g, "\\n");
+  const ics = [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Salone Vincente//Hiring//IT",
+    "BEGIN:VEVENT", `UID:hiring-${e}@salonevincente`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}Z`,
+    `DTSTART;TZID=Europe/Rome:${loc(inizio)}`, `DTEND;TZID=Europe/Rome:${loc(fine)}`,
+    `SUMMARY:${esc(titolo)}`, `DESCRIPTION:${esc(dettagli)}`, zoom ? `LOCATION:${esc(zoom)}` : "",
+    "BEGIN:VALARM", "TRIGGER:-PT1H", "ACTION:DISPLAY", "DESCRIPTION:Videochiamata tra 1 ora", "END:VALARM",
+    "END:VEVENT", "END:VCALENDAR",
+  ].filter(Boolean).join("\r\n");
+  document.getElementById("ics").href = "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
+
+  // Su Android si va dritti a Google Calendar; su iPhone si lascia scegliere.
+  if (!/iPhone|iPad|Macintosh/.test(navigator.userAgent)) location.replace(g_url);
+} else {
+  document.getElementById("quando").textContent = "Link non valido.";
+}
+</script>
+</body>
+</html>
