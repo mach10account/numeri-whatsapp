@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Numeri WhatsApp · Salone Vincente</title>
+<style>
+  :root {
+    --blu: #0654AE; --azzurro: #4ECCDE; --testo: #14213d; --grigio: #5b6478;
+    --bordo: #e3e8f0; --sfondo: #f5f7fb; --verde: #13854e; --rosso: #c0392b; --giallo: #b7791f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         color: var(--testo); background: var(--sfondo); }
+  header { background: linear-gradient(90deg, var(--blu), var(--azzurro)); color: #fff; padding: 22px 20px; }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 4px 0 0; opacity: .9; }
+  main { max-width: 760px; margin: 0 auto; padding: 20px; }
+  .card { background: #fff; border: 1px solid var(--bordo); border-radius: 14px; padding: 18px 20px; margin-bottom: 16px; }
+  .card h2 { margin: 0 0 12px; font-size: 17px; }
+  label { display: block; font-weight: 600; margin: 12px 0 4px; }
+  input[type=text], input[type=password], input[type=tel] {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--bordo); border-radius: 9px; font: inherit; }
+  .scelta { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--bordo); border-radius: 10px;
+            padding: 10px 12px; margin-top: 8px; cursor: pointer; font-weight: 400; }
+  .scelta input { margin-top: 4px; }
+  .scelta small { display: block; color: var(--grigio); }
+  button { border: 0; border-radius: 10px; padding: 12px 18px; font-family: inherit; font-weight: 600; font-size: 15px; cursor: pointer;
+           background: var(--blu); color: #fff; margin-top: 14px; }
+  button.secondario { background: #fff; color: var(--blu); border: 1px solid var(--blu); padding: 8px 12px; font-size: 13px; margin: 0; }
+  button:disabled { opacity: .5; cursor: wait; }
+  .wa { background: #1fa855; }
+  .nota { color: var(--grigio); font-size: 13px; margin: 6px 0 0; }
+  .msg { margin-top: 12px; padding: 10px 12px; border-radius: 9px; display: none; white-space: pre-wrap; }
+  .msg.ok { display: block; background: #e8f6ee; color: var(--verde); }
+  .msg.ko { display: block; background: #fdecea; color: var(--rosso); }
+  .msg.info { display: block; background: #eef4fd; color: var(--blu); }
+  .numero { border: 1px solid var(--bordo); border-radius: 10px; padding: 12px 14px; margin-top: 10px; }
+  .numero .riga { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .numero b { font-size: 16px; }
+  .bollino { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+  .bollino.collegato { background: #e8f6ee; color: var(--verde); }
+  .bollino.errore { background: #fdecea; color: var(--rosso); }
+  .bollino.da_collegare { background: #fff6e5; color: var(--giallo); }
+  .dett { color: var(--grigio); font-size: 13px; margin-top: 4px; }
+  .avviso { color: var(--rosso); font-size: 13px; margin-top: 6px; }
+  .vuoto { color: var(--grigio); }
+  .griglia { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+  @media (max-width: 560px) { .griglia { grid-template-columns: 1fr; } }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Numeri WhatsApp interni</h1>
+  <p>I numeri di Salone Vincente usati dalle automazioni (hiring e altri). Non è ANIMA.</p>
+</header>
+<main>
+
+  <section class="card" id="accesso" hidden>
+    <h2>Accesso</h2>
+    <label for="chiave">Chiave</label>
+    <input type="password" id="chiave" autocomplete="current-password" placeholder="Chiave di accesso">
+    <button id="entra">Entra</button>
+    <div class="msg" id="msgAccesso"></div>
+  </section>
+
+  <div id="app" hidden>
+    <section class="card">
+      <div class="riga" style="display:flex;justify-content:space-between;align-items:center">
+        <h2 style="margin:0">Numeri collegati</h2>
+        <button class="secondario" id="aggiorna">Aggiorna</button>
+      </div>
+      <div id="elenco"><p class="vuoto">Carico…</p></div>
+    </section>
+
+    <section class="card">
+      <h2>Collega un numero</h2>
+      <label for="nome">Nome per le automazioni</label>
+      <input type="text" id="nome" value="hiring" maxlength="31">
+      <p class="nota">Lo usano i workflow n8n per dire da quale numero mandare. Solo lettere minuscole, numeri, - e _.
+        Ricollegare con lo stesso nome sostituisce il numero.</p>
+
+      <label>Il numero…</label>
+      <label class="scelta">
+        <input type="radio" name="modalita" value="cloud" checked>
+        <span>è nuovo, serve solo alle automazioni
+          <small>Meta manda un codice via SMS o chiamata. Dopo il collegamento il numero non si usa più dall'app WhatsApp del telefono.</small></span>
+      </label>
+      <label class="scelta">
+        <input type="radio" name="modalita" value="coexistence">
+        <span>è già su WhatsApp Business in un telefono, e deve restarci
+          <small>Si risponde dal telefono come oggi, le automazioni mandano in parallelo. Il numero deve essere usato su WhatsApp Business da almeno 7 giorni.</small></span>
+      </label>
+
+      <button class="wa" id="collega">Collega WhatsApp</button>
+      <p class="nota">Si apre la finestra di Meta: entra col Facebook che gestisce il portfolio di Salone Vincente.
+        Come nome visibile metti «Salone Vincente»: Meta rifiuta i nomi che non corrispondono all'azienda verificata, e finché il nome non è approvato non parte nessun messaggio.</p>
+      <div class="msg" id="msgCollega"></div>
+    </section>
+
+    <section class="card">
+      <h2>Prova d'invio</h2>
+      <div class="griglia">
+        <div><label for="provaNumero">Da (nome)</label><input type="text" id="provaNumero" value="hiring"></div>
+        <div><label for="provaA">A (telefono)</label><input type="tel" id="provaA" placeholder="+39 …"></div>
+        <div><label for="provaTemplate">Template</label><input type="text" id="provaTemplate" value="hello_world"></div>
+        <div><label for="provaLingua">Lingua</label><input type="text" id="provaLingua" value="en_US"></div>
+      </div>
+      <p class="nota">«hello_world» c'è su ogni account nuovo. Per gli altri template servono parametri: da qui si prova solo quelli senza.</p>
+      <button id="prova">Manda la prova</button>
+      <div class="msg" id="msgProva"></div>
+    </section>
+  </div>
+</main>
+
+<script>
+const API = "https://hypkwdvvrmakqrowbkqw.supabase.co/functions/v1/wa-interni";
+const $ = (id) => document.getElementById(id);
+let chiave = localStorage.getItem("numeri-wa-chiave") || "";
+
+async function chiama(azione, dati = {}) {
+  const r = await fetch(API, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ chiave, azione, ...dati }),
+  });
+  const b = await r.json().catch(() => ({ ok: false, errore: `Risposta illeggibile (${r.status})` }));
+  if (r.status === 403 && b.errore === "Chiave sbagliata") esci();
+  return b;
+}
+
+function mostra(id, tipo, testo) { const el = $(id); el.className = "msg " + tipo; el.textContent = testo; }
+function quando(iso) {
+  if (!iso) return "mai";
+  const d = new Date(iso);
+  return d.toLocaleDateString("it-IT", { day: "numeric", month: "short" }) + " " +
+    d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+}
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function esci() {
+  localStorage.removeItem("numeri-wa-chiave"); chiave = "";
+  $("app").hidden = true; $("accesso").hidden = false;
+}
+
+async function caricaElenco() {
+  const b = await chiama("elenco");
+  if (!b.ok) { $("elenco").innerHTML = `<p class="avviso">${esc(b.errore)}</p>`; return; }
+  if (!b.numeri.length) { $("elenco").innerHTML = '<p class="vuoto">Nessun numero ancora. Collegalo qui sotto.</p>'; return; }
+  $("elenco").innerHTML = b.numeri.map((n) => `
+    <div class="numero">
+      <div class="riga"><b>${esc(n.nome)} · ${esc(n.numero || "—")}</b>
+        <span class="bollino ${esc(n.stato)}">${n.stato === "collegato" ? "Collegato" : n.stato === "errore" ? "Errore" : "Da collegare"}</span></div>
+      <div class="dett">Nome visibile: ${esc(n.nome_verificato || "—")} ·
+        ${n.modalita === "coexistence" ? "anche sul telefono" : "solo automazioni"} ·
+        ultimo inviato ${quando(n.ultimo_out)} · ultima risposta ${quando(n.ultimo_in)} ·
+        risposte a n8n: ${n.inoltro ? "sì" : "no"}</div>
+      ${n.errore ? `<div class="avviso">⚠️ ${esc(n.errore)}</div>` : ""}
+    </div>`).join("");
+}
+
+// ------------------------------------------------ Embedded Signup di Meta
+let fbPronto = null;
+function caricaFacebook(appId, version) {
+  if (fbPronto) return fbPronto;
+  fbPronto = new Promise((ok, ko) => {
+    window.fbAsyncInit = () => { FB.init({ appId, autoLogAppEvents: true, xfbml: false, version }); ok(); };
+    const s = document.createElement("script");
+    s.src = "https://connect.facebook.net/en_US/sdk.js";
+    s.async = true; s.defer = true; s.crossOrigin = "anonymous";
+    s.onerror = () => { fbPronto = null; ko(new Error("Non riesco a caricare Facebook (blocco pubblicità?)")); };
+    document.head.appendChild(s);
+  });
+  return fbPronto;
+}
+
+// Meta racconta com'è andato il giro con un postMessage: lì ci sono l'account
+// WhatsApp e il numero scelti, che il login da solo non dice.
+let giro = {};
+window.addEventListener("message", (ev) => {
+  if (!String(ev.origin).endsWith("facebook.com")) return;
+  try {
+    const d = JSON.parse(ev.data);
+    if (d.type !== "WA_EMBEDDED_SIGNUP") return;
+    giro.evento = d.event;
+    if (d.data?.waba_id) giro.waba_id = d.data.waba_id;
+    if (d.data?.phone_number_id) giro.phone_number_id = d.data.phone_number_id;
+    if (d.event === "CANCEL") giro.annullato = d.data?.current_step || true;
+  } catch { /* messaggi non nostri */ }
+});
+
+function login(configId, coexistence) {
+  const extras = { setup: {}, sessionInfoVersion: "3" };
+  if (coexistence) extras.featureType = "whatsapp_business_app_onboarding";
+  return new Promise((ok) => {
+    FB.login((res) => ok(res?.authResponse?.code ?? null), {
+      config_id: configId, response_type: "code", override_default_response_type: true, extras,
+    });
+  });
+}
+
+$("collega").onclick = async () => {
+  const nome = $("nome").value.trim().toLowerCase();
+  const modalita = document.querySelector("input[name=modalita]:checked").value;
+  if (!/^[a-z0-9][a-z0-9_-]{1,30}$/.test(nome)) return mostra("msgCollega", "ko", "Nome non valido: es. hiring");
+  $("collega").disabled = true;
+  mostra("msgCollega", "info", "Apro la finestra di Meta…");
+  try {
+    const cfg = await chiama("config");
+    if (!cfg.ok || !cfg.config_id) throw new Error(cfg.errore || "Configurazione Meta mancante");
+    await caricaFacebook(cfg.app_id, cfg.graph_version);
+    giro = {};
+    const code = await login(cfg.config_id, modalita === "coexistence");
+    if (!code) {
+      throw new Error(giro.annullato ? `Collegamento annullato (passo: ${giro.annullato}).` : "Finestra chiusa senza completare.");
+    }
+    mostra("msgCollega", "info", "Meta ha risposto, completo il collegamento…");
+    const b = await chiama("collega", {
+      nome, code, modalita: giro.evento === "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING" ? "coexistence" : modalita,
+      waba_id: giro.waba_id || null, phone_number_id: giro.phone_number_id || null,
+    });
+    if (!b.ok) throw new Error(b.errore);
+    let t = `✅ Collegato: ${b.numero || ""} (${b.nome_verificato || "nome in attesa"}) come «${b.nome}».`;
+    if (b.stato_nome && b.stato_nome !== "APPROVED") t += `\nNome visibile: ${b.stato_nome}. Finché Meta non lo approva i messaggi non partono.`;
+    if (b.avviso) t += `\n⚠️ ${b.avviso}`;
+    mostra("msgCollega", b.avviso ? "info" : "ok", t);
+    $("provaNumero").value = b.nome;
+  } catch (e) {
+    mostra("msgCollega", "ko", e.message || String(e));
+  } finally {
+    $("collega").disabled = false;
+    caricaElenco();
+  }
+};
+
+$("prova").onclick = async () => {
+  $("prova").disabled = true;
+  const b = await chiama("invia", {
+    numero: $("provaNumero").value.trim().toLowerCase(), a: $("provaA").value,
+    template: { nome: $("provaTemplate").value.trim(), lingua: $("provaLingua").value.trim() || "it" },
+  });
+  $("prova").disabled = false;
+  mostra("msgProva", b.ok ? "ok" : "ko", b.ok ? `✅ Partito verso +${b.a}` : b.errore);
+  caricaElenco();
+};
+
+$("aggiorna").onclick = caricaElenco;
+$("entra").onclick = async () => {
+  chiave = $("chiave").value.trim();
+  const b = await chiama("elenco");
+  if (!b.ok) return mostra("msgAccesso", "ko", b.errore || "Accesso non riuscito");
+  localStorage.setItem("numeri-wa-chiave", chiave);
+  avvia();
+};
+$("chiave").addEventListener("keydown", (e) => { if (e.key === "Enter") $("entra").click(); });
+
+function avvia() {
+  if (!chiave) { $("accesso").hidden = false; return; }
+  $("accesso").hidden = true; $("app").hidden = false;
+  caricaElenco();
+}
+avvia();
+</script>
+</body>
+</html>
