@@ -8,6 +8,8 @@ altri) all'app Meta «Agenda Salone Vincente» `1025459190200664`, la stessa di 
   qui non va MAI un segreto). Il dominio `mach10account.github.io` è già tra quelli dell'app
   Meta, per questo il bottone sta qui e non su manager.mach10holding.com.
 - Accesso: chiave in `~/.segreti/numeri-whatsapp.txt` (nella funzione c'è solo l'hash).
+  Sul VPS dev il team la trova in `/srv/team/numero-hiring/` (gruppo `team`), insieme all'attrezzo
+  `hiring.py` (chat, template, invii) e alla guida `LEGGIMI.md`: si parte da lì.
 - Backend: edge function **`wa-interni`** sul progetto SV Platform `hypkwdvvrmakqrowbkqw`,
   sorgente in `wa-receptionist/supabase/functions/wa-interni/`, tabelle `wa.numeri_interni`
   e `wa.interni_messaggi` (`wa-receptionist/sql/018_numeri_interni.sql`).
